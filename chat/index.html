@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>vocojs Home Page</title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+    <link rel="stylesheet" type="text/css" href="app.css" />
+    <script type="text/javascript" src="voco-1.0-debug.js"></script>
+    <script type="text/javascript">
+        function parse(prop){
+            var p =  prop.replace(/[^\-\d\.]+/,'');
+            var q;
+            try {
+                q=parseFloat(p);
+            } catch(err) {
+                q=0;
+            }
+            return q;
+        }
+
+        function addMsg (msg, direction, fromNick) {
+            var p = document.createElement('p');
+
+            p.className = p.className + " " + direction;
+
+            if (direction === "rx") {
+                var nick = document.createElement('span');
+                nick.className = "fromNick";
+                var tNick = document.createTextNode(fromNick);
+                nick.appendChild(tNick);
+                p.appendChild(nick);
+            }
+
+            var t = document.createTextNode(msg);
+            p.appendChild(t);
+
+            var out = document.getElementById("chat");
+            p.innerHTML = p.innerHTML + "&nbsp;";
+
+            out.appendChild(p);
+            var style = out.currentStyle || window.getComputedStyle(out);
+
+            var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + parse(style.marginTop) + parse(style.marginBottom) +20;
+            if(isScrolledToBottom)
+                out.scrollTop = out.scrollHeight - out.clientHeight;
+        }
+
+        function onSend() {
+            var user = document.getElementById("nickName").value;
+            var text = document.getElementById("txMsg").value;
+            var msg = user + ":"+ text;
+
+            document.getElementById("txMsg").value = "";
+            addMsg(text,"tx");
+//            document.getElementById("txMsg").focus();
+            window.vocojs.txString(msg);
+        }
+
+        function onKey(e) {
+            if (e.keyCode == 13) {
+                onSend();
+                return false;
+            }
+        }
+
+        function init() {
+            vocojs.initTx();
+            document.getElementById("nickName").value = "user-" + Math.floor(Math.random()*100000);
+//            document.getElementById("txMsg").focus();
+            window.vocojs.onRxString(function(msg) {
+                var p = msg.indexOf(":");
+                if (p<0) return;
+                var user = msg.substr(0,p);
+                var text = msg.substr(p+1);
+                if (user !== document.getElementById("nickName").value) {
+                    addMsg(text,"rx", user);
+                }
+            });
+        }
+    </script>
+</head>
+<body onload="init()">
+        <div id="screen">
+            <div id="container">
+                <div id="header">
+                    <h1>vocojs</h1>
+                    <p>Send and receive messages thru sound.</p>
+                    <p>For more info <a href="https://www.github.com">view project in github</a></p>
+                </div>
+                <div id="nickContainer">
+                    <label for="nickName">Nick Name: </label>
+                    <input id="nickName" size="10"/>
+                </div>
+                <div id="chat">
+
+                </div>
+                <div id="txContainer">
+                    <input id="txMsg" onkeypress="return onKey(event)" size="11" maxlength="21"/>
+                    <button id="txButton" onclick="onSend()">&#x1f50a;</button>
+                </div>
+            </div>
+        </div>
+</body>
+</html>

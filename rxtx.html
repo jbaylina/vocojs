@@ -1,0 +1,74 @@
+<html>
+<head>
+    <script type="text/javascript" src="build/voco.js"></script>
+    <script type="text/javascript" src="js/analitzer.js"></script>
+    <script type="text/javascript">
+
+        window.addEventListener('load', function() {
+            window.vocojs.initTx();
+            window.vocojs.onRxString(function(S) {
+                addRx(S);
+                updateAnalizerErr();
+            });
+
+
+        }, false);
+
+        function txData() {
+            var S= document.getElementById("txdata").value;
+            window.vocojs.txString(S);
+        }
+
+        function addRx(S) {
+            var list = document.getElementById('rx');
+            var entry = document.createElement('li');
+            entry.appendChild(document.createTextNode(S));
+            list.appendChild(entry);
+
+            var objDiv = document.getElementById("drx");
+            objDiv.scrollTop = objDiv.scrollHeight;
+        }
+
+        function clearRx() {
+            var objDiv = document.getElementById("rx");
+            objDiv.innerHTML="";
+        }
+
+    </script>
+    <style>
+        #dleft {
+            float: left;
+            width: 300px;
+        }
+
+        #dright {
+            float: left;
+            height: 800px;
+        }
+
+        #drx {
+            overflow-y: scroll;
+            max-height: 100px;
+        }
+
+    </style>
+
+</head>
+<body>
+    <div id="dleft">
+        <h1>VocoJS - Tx</h1>
+            <input id="txdata" value="123456789-123456789-123456789-12" />
+            <button onClick="txData()"> Send </button>
+        <h1>VocoJS - Rx</h1>
+        <div id="drx">
+            <ol id="rx">
+                <li>Hola</li>
+            </ol>
+        </div>
+        <button onclick="clearRx()"> clear </button>
+    </div>
+    <div id="dright">
+        <canvas width="1024" height="800" id="analizer"></canvas>
+    </div>
+</body>
+</html>
